@@ -1,0 +1,10 @@
+[package]
+name = "entity"
+version = "0.1.0"
+license = "MIT"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]

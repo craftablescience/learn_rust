@@ -1,0 +1,11 @@
+[package]
+name = "platform"
+version = "0.1.0"
+license = "MIT"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+lapp = "0.4" # parse command line arguments
