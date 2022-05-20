@@ -720,12 +720,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "lapp"
-version = "0.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "60bf485afeba9437a275ad29a9383b03f2978450e7feceffb55be8c0dbad9829"
-
-[[package]]
 name = "lazy_static"
 version = "1.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -741,11 +735,7 @@ checksum = "830d08ce1d1d941e6b30645f1a0eb5643013d835ce3779a5fc208261dbe10f55"
 name = "learn_rust"
 version = "0.1.0"
 dependencies = [
- "cfg-if 1.0.0",
- "console_error_panic_hook",
- "console_log",
  "entity",
- "env_logger",
  "log",
  "platform",
  "pollster",
@@ -754,9 +744,7 @@ dependencies = [
  "sound",
  "wasm-bindgen",
  "wasm-bindgen-futures",
- "web-sys",
  "wgpu",
- "winit",
 ]
 
 [[package]]
@@ -1168,7 +1156,15 @@ checksum = "1df8c4ec4b0627e53bdf214615ad287367e482558cf84b109250b37464dc03ae"
 name = "platform"
 version = "0.1.0"
 dependencies = [
- "lapp",
+ "cfg-if 1.0.0",
+ "console_error_panic_hook",
+ "console_log",
+ "env_logger",
+ "log",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
+ "web-sys",
+ "winit",
 ]
 
 [[package]]

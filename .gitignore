@@ -1,4 +1,11 @@
+# JetBran
 .idea/
+*.iml
+
+# Microsoft
+.vs/
 .vscode/
+
+# Generated
 pkg/
 target/

@@ -1,9 +1,10 @@
 use std::iter;
 
-use winit::{
+use platform::{
+    Application,
+    winit::event_loop::ControlFlow,
     event::*,
-    event_loop::{ControlFlow, EventLoop},
-    window::{Window, WindowBuilder},
+    Window,
 };
 
 use wgpu::include_wgsl;
@@ -16,7 +17,7 @@ struct State {
     device: wgpu::Device,
     queue: wgpu::Queue,
     config: wgpu::SurfaceConfiguration,
-    size: winit::dpi::PhysicalSize<u32>,
+    size: platform::winit::dpi::PhysicalSize<u32>,
     render_pipeline: wgpu::RenderPipeline,
 }
 
@@ -124,7 +125,7 @@ impl State {
         }
     }
 
-    fn resize(&mut self, new_size: winit::dpi::PhysicalSize<u32>) {
+    fn resize(&mut self, new_size: platform::winit::dpi::PhysicalSize<u32>) {
         if new_size.width > 0 && new_size.height > 0 {
             self.size = new_size;
             self.config.width = new_size.width;
@@ -177,53 +178,18 @@ impl State {
 
 #[cfg_attr(target_arch = "wasm32", wasm_bindgen(start))]
 pub async fn run() {
-    cfg_if::cfg_if! {
-        if #[cfg(target_arch = "wasm32")] {
-            std::panic::set_hook(Box::new(console_error_panic_hook::hook));
-            console_log::init_with_level(log::Level::Warn).expect("Could't initialize logger");
-        } else {
-            env_logger::init();
-        }
-    }
-
-    entity::entity();
-    platform::platform();
-    render::render();
-    script::script();
-    sound::sound();
-
-    let event_loop = EventLoop::new();
-    let window = WindowBuilder::new().with_visible(false).build(&event_loop).unwrap();
-
-    #[cfg(target_arch = "wasm32")]
-    {
-        // Winit prevents sizing with CSS, so we have to set
-        // the size manually when on web.
-        use winit::dpi::PhysicalSize;
-        window.set_inner_size(PhysicalSize::new(450, 400));
-
-        use winit::platform::web::WindowExtWebSys;
-        web_sys::window()
-            .and_then(|win| win.document())
-            .and_then(|doc| {
-                let dst = doc.get_element_by_id("wasm-example")?;
-                let canvas = web_sys::Element::from(window.canvas());
-                dst.append_child(&canvas).ok()?;
-                Some(())
-            })
-            .expect("Couldn't append canvas to document body.");
-    }
+    let app = Application::new("learn_rust");
 
     // State::new uses async code, so we're going to wait for it to finish
-    let mut state = State::new(&window).await;
-    window.set_visible(true);
+    let mut state = State::new(&app.window).await;
+    app.window.set_visible(true);
 
-    event_loop.run(move |event, _, control_flow| {
+    app.event_loop.run(move |event, _, control_flow| {
         match event {
             Event::WindowEvent {
                 ref event,
                 window_id,
-            } if window_id == window.id() => {
+            } if window_id == app.window.id() => {
                 if !state.input(event) {
                     match event {
                         WindowEvent::CloseRequested
@@ -250,9 +216,9 @@ pub async fn run() {
             Event::RedrawEventsCleared => {
                 // RedrawRequested will only trigger once, unless we manually
                 // request it.
-                window.request_redraw();
+                app.window.request_redraw();
             }
-            Event::RedrawRequested(window_id) if window_id == window.id() => {
+            Event::RedrawRequested(window_id) if window_id == app.window.id() => {
                 match state.render() {
                     Ok(_) => {}
                     // Reconfigure the surface if it's lost or outdated
